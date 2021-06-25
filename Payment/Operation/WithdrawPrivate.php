@@ -5,13 +5,14 @@ use Payment\Helper\MoneyHelper;
 use Payment\Helper\DateHelper;
 use Payment\Currency\CurrencyRepository;
 use Payment\Money\Money;
+use Payment\Money\MoneyInterface;
 
 class WithdrawPrivate extends AbstractOperation {
     const FREE_QTY_OPERATION = 3;
     const FREE_AMOUNT = 1000;
     const COMISSION_RATE = 0.003;
 
-    public function calculateComission() {
+    public function calculateComission(): MoneyInterface {
         $baseCurrency = CurrencyRepository::getBaseCurrency();
         $exceedAmount = new Money(0, $baseCurrency);
 
@@ -43,6 +44,6 @@ class WithdrawPrivate extends AbstractOperation {
             $exceedAmount = $zeroAmount;
         }
 
-        $this->setComission($exceedAmount->multiply(self::COMISSION_RATE));
+        return $exceedAmount->multiply(self::COMISSION_RATE);
     }
 }

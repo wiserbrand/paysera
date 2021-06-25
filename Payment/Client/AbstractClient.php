@@ -3,33 +3,64 @@ namespace Payment\Client;
 
 use Payment\Operation\OperationInterface;
 
+/**
+ * Undocumented class
+ */
 abstract class AbstractClient implements ClientInterface {
 
+    /**
+     * 
+     */
     protected int $id;
+
+    /**
+     * Undocumented variable
+     *
+     * @var array
+     */
     protected $operations = [];
 
+    /**
+     * Undocumented function
+     *
+     * @param integer $id
+     * @param String $type
+     * @return void
+     */
+    public static function create(int $id, String $type) {
+        $classType = __NAMESPACE__ . "\\" . ucfirst($type) . "Client";
+
+        if (!class_exists($classType)) {
+            throw new Exception\UnknownClientTypeException($type);
+        }
+
+        return new $classType($id);
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param integer $id
+     */
     function __construct(int $id) {
         $this->id = $id;
     }
 
+    /**
+     * Undocumented function
+     *
+     * @return integer
+     */
     public function getId(): int {
         return $this->id;
     }
 
-    public static function get(int $userId, String $userType) {
-        $classType = __NAMESPACE__ . "\\" . ucfirst($userType) . "Client";
-
-        if (!class_exists($classType)) {
-            throw new Exception\UnknownClientTypeException($userType);
-        }
-
-        return new $classType($userId);
-    }
-
-    public function addOperation(OperationInterface $operation) {
-        $this->operations[] = $operation->getId();
-    }
-
+    /**
+     * Undocumented function
+     *
+     * @param ClientInterface $client
+     * @return boolean
+     */
     public function equals(ClientInterface $client): bool {
         return $this->getId()==$client->getId();
     }

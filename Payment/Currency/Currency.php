@@ -5,6 +5,7 @@ namespace Payment\Currency;
  * Undocumented class
  */
 class Currency implements CurrencyInterface {
+
     /**
      * 
      */

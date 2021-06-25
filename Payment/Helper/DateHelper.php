@@ -1,7 +1,17 @@
 <?php
 namespace Payment\Helper;
 
+/**
+ * Undocumented class
+ */
 class DateHelper {
+
+    /**
+     * Undocumented function
+     *
+     * @param \DateTime $date
+     * @return void
+     */
     public static function getLastMonday(\DateTime $date = null) {
         if (!$date) {
             $date = new \DateTime();

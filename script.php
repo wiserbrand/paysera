@@ -44,7 +44,6 @@ use Payment\Processor;
                         $amount,
                         new \DateTime($csvRow['date']),
                     );
-                    $client->addOperation($operation);
                    
                     Processor::process($operation);
                     echo $operation->getComission()->roundUp() . "\n";
