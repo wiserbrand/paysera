@@ -1,5 +1,7 @@
 #!/usr/bin/env php
 <?php
+declare(strict_types=1);
+
 require __DIR__.'/vendor/autoload.php';
 
 use Symfony\Component\Console\Input\InputArgument;
@@ -8,16 +10,17 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\SingleCommandApplication;
 
-use Payment\Client\ClientRepository;
-use Payment\Currency\CurrencyRepository;
-use Payment\Operation\OperationRepository;
-use Payment\Money\Money;
-use Payment\Processor;
+use Payment\Repository\ClientRepository;
+use Payment\Repository\CurrencyRepository;
+use Payment\Entity\Money\Money;
+use Payment\Service\OperationService;
+use Payment\Service\CurrencyService;
 
 (new SingleCommandApplication())
     ->setName('Paysera Command') // Optional
     ->setVersion('1.0.0') // Optional
     ->addArgument('csv', InputArgument::REQUIRED, 'Input CSV file')
+    ->addArgument('test', InputArgument::OPTIONAL, 'Use test Currencies')
     ->setCode(function (InputInterface $input, OutputInterface $output) {
         $inputFileName = $input->getArgument('csv');
         if (($inputHandler = fopen($inputFileName, 'r')) !== FALSE)
@@ -30,6 +33,7 @@ use Payment\Processor;
                 'oper_amount',
                 'currency'
             ];
+            CurrencyService::init($input->getArgument('test')=='test');
             while (($inputRow = fgetcsv($inputHandler, 1000)) !== FALSE)
             {
                 try {
@@ -37,15 +41,15 @@ use Payment\Processor;
 
                     $client = ClientRepository::get(intval($csvRow['user_id']), $csvRow['user_type']);
                     $currency = CurrencyRepository::get(strtoupper($csvRow['currency']));
-                    $amount = new Money($csvRow['oper_amount'], $currency);
-                    $operation = OperationRepository::create(
+                    $amount = new Money(floatval($csvRow['oper_amount']), $currency);
+                    $operation = OperationService::create(
                         $client, 
                         $csvRow['oper_type'],
                         $amount,
                         new \DateTime($csvRow['date']),
                     );
                    
-                    Processor::process($operation);
+                    OperationService::process($operation);
                     echo $operation->getComission()->roundUp() . "\n";
                 } catch (Exception $e) {
                     fwrite(STDERR, sprintf("[%s] %s\n", get_class($e), $e->getMessage()));
