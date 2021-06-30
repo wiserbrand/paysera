@@ -6,30 +6,33 @@ use Payment\Entity\Currency\Currency;
 use Payment\Repository\CurrencyRepository;
 
 class CurrencyService {
-    
+   
+    // access key should be loaded from configuration
     private static $accessKey = '8a2166a08619e96c7a47b664df83a9fa';
-    private static $supportedCurrency = [
-        'EUR' => ['rate' => 1, 'scale' => 2, 'ceil' => false],
-        'USD' => ['rate' => 1.1497, 'scale' => 2, 'ceil' => false],
-        'JPY' => ['rate' => 129.53, 'scale' => 0, 'ceil' => true],
-    ];
 
-
-    public static function init($test =false) {
+    /**
+     *
+     * @param [type] $currencies
+     * @param boolean $test
+     * @return void
+     */
+    public static function init($currencies, $test =false) {
         if ($test) {
-            self::initTestCurrency();
+            self::initTestCurrency($currencies);
         }
         else {
-            self::initCurrency();
+            self::initCurrency($currencies);
         }
     }
 
-    public static function initCurrency() {
+    private static function initCurrency($currencies) {
 
-        $currencies = implode(',', array_merge(['EUR', 'USD'], array_keys(self::$supportedCurrency)));
+        $currencyList = implode(',', array_merge(['EUR', 'USD'], array_keys($currencies)));
 
         $client = HttpClient::create();
-        $url = sprintf('http://api.exchangeratesapi.io/live?access_key=%s&currencies=%s', self::$accessKey, $currencies);
+        
+        // separate service should be created
+        $url = sprintf('http://api.exchangeratesapi.io/live?access_key=%s&currencies=%s', self::$accessKey, $currencyList);
         
         $response = $client->request('GET', $url);
         if ($response->getStatusCode()!=200) {
@@ -43,7 +46,7 @@ class CurrencyService {
         // eur_rate = usd_rate * (1 / eur_usd_rate)
         $baseRate = 1/$content['quotes']["USDEUR"];
 
-        foreach (self::$supportedCurrency as $name => $curr) {
+        foreach ($currencies as $name => $curr) {
             $rate = $baseRate * $content['quotes']["USD${name}"];
             $currency = new Currency($name, $rate, $curr['scale'], $curr['ceil']);
             CurrencyRepository::add($currency);
@@ -54,8 +57,8 @@ class CurrencyService {
      *
      * @return void
      */
-    private static function initTestCurrency() {
-        foreach (self::$supportedCurrency as $name => $curr) {
+    private static function initTestCurrency($currencies) {
+        foreach ($currencies as $name => $curr) {
             $currency = new Currency($name, $curr['rate'], $curr['scale'], $curr['ceil']);
             CurrencyRepository::add($currency);
         } 

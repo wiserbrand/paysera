@@ -1,0 +1,21 @@
+File descriptions:
+==================
+script.php - main command script 
+currency.json - list of supported currencies with sample rate for autotest
+    * array of supported currencies
+        - rate - sample rate
+        - scale - decimals digits
+        - ceil - round to integer (ignore decimals)
+test.sh - run autotest
+input.csv - sample input data for autotest
+output.csv - sample output data for autotest
+
+How to use:
+===========
+- autotest
+   $ ./test.sh 
+    * Passed if all ok
+    * Failed if wrong output
+- normal usage
+    $ php script.php input.csv
+        * output csv will be displayed

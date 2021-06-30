@@ -11,7 +11,7 @@ use Payment\Service\Comission\AbstractComission;
 class OperationService {
 
     /**
-     * 
+     * Sequence for generate IDs of operations
      */
     private static int $sequence = 1;
 

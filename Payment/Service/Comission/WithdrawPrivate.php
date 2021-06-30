@@ -7,6 +7,7 @@ use Payment\Repository\OperationRepository;
 use Payment\Entity\Money\Money;
 use Payment\Entity\Money\MoneyInterface;
 use Payment\Entity\Operation\OperationInterface;
+use Payment\Entity\Operation\Withdraw;
 
 /**
  * 
@@ -38,19 +39,23 @@ class WithdrawPrivate implements ComissionInterface {
         $baseCurrency = CurrencyRepository::getBaseCurrency();
         $exceedAmount = new Money(0, $baseCurrency);
 
-        $operations = OperationRepository::getFromDate(
+        // get list of operations from Monday
+        $operations = OperationRepository::getOperationsForWeek(
             $operation->getClient(), 
-            DateHelper::getLastMonday($operation->getDate())
+            Withdraw::class,
+            $operation->getDate()
         );
 
         if (count($operations)>self::FREE_QTY_OPERATION) {
             $exceedAmount = clone $operation->getAmount();
         } else {
             $withdrawAmount = new Money(0, $baseCurrency);
+            // calculate total amount for operations 
             foreach ($operations as $op) {
                 $withdrawAmount->add($op->getAmount());
             }
 
+            // calculate exceed amount for current operation
             $freeAmount = new Money(self::FREE_AMOUNT, $baseCurrency);
             if ($withdrawAmount->lessOrEquals($freeAmount)) {
                 $exceedAmount = (clone $operation->getAmount())->subtract(

@@ -1,0 +1,17 @@
+{
+        "EUR": {
+            "rate": 1,
+            "scale": 2,
+            "ceil": 0
+        },
+        "USD": {
+            "rate": 1.1497,
+            "scale": 2,
+            "ceil": 0
+        },
+        "JPY": {
+            "rate": 129.53,
+            "scale": 0,
+            "ceil": 1
+        }
+}

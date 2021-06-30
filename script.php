@@ -33,7 +33,8 @@ use Payment\Service\CurrencyService;
                 'oper_amount',
                 'currency'
             ];
-            CurrencyService::init($input->getArgument('test')=='test');
+            $currencies = json_decode(file_get_contents('currency.json'), true);
+            CurrencyService::init($currencies, $input->getArgument('test')=='test');
             while (($inputRow = fgetcsv($inputHandler, 1000)) !== FALSE)
             {
                 try {

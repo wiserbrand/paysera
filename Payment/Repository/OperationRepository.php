@@ -5,6 +5,7 @@ use Payment\Entity\Client\ClientInterface;
 use Payment\Entity\Currency\CurrencyInterface;
 use Payment\Entity\Money\MoneyInterface;
 use Payment\Entity\Operation\OperationInterface;
+use Payment\Helper\DateHelper;
 
 /**
  * 
@@ -12,6 +13,7 @@ use Payment\Entity\Operation\OperationInterface;
 class OperationRepository {
 
     /**
+     * In-memory storage
      *
      * @var array
      */
@@ -36,16 +38,20 @@ class OperationRepository {
     }
 
     /**
-     *
+     * Get list of operations for last week
+     * 
      * @param [type] $client
-     * @param [type] $startDate
+     * @param [type] $class Base class to identify Operation
+     * @param [type] $date
      * @return void
      */
-    public static function getFromDate($client, $startDate) {
+    public static function getOperationsForWeek($client, $class, $date) {
         $result = [];
+
+        $startDate = DateHelper::getLastMonday($date);
         foreach (self::$operations as $op) {
             if ($op->getClient()->equals($client)) {
-                if ($op->getDate()>=$startDate && $op->isProcessed()) {
+                if (is_a($op, $class) && $op->isProcessed() && $op->getDate()>=$startDate && $op->getDate()<=$date) {
                     $result[] = $op;
                 }
             }

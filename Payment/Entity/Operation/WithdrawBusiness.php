@@ -1,10 +1,8 @@
 <?php
 namespace Payment\Entity\Operation;
 
-use Payment\Entity\Money\MoneyInterface;
-
 /**
  * 
  */
-class WithdrawBusiness extends AbstractOperation {
+class WithdrawBusiness extends Withdraw {
 }
